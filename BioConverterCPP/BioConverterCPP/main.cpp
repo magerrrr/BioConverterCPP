@@ -6,9 +6,13 @@
 //  Copyright © 2019 Kirill. All rights reserved.
 //
 
+#include <map>
+#include <tuple>
 #include <iostream>
 
-enum Biomarker{
+using namespace std;
+
+enum Biomarker {
     INSULIN,
     GLUCOSE,
     LDL,
@@ -22,208 +26,161 @@ enum Biomarker{
     FERRITIN
 };
 
-double insulin_units[15] = { // index access 0
-    0,         // mmol/l // 0
-    0,         // µmol/L // 1
-    0,         // nmol/L // 2
-    6.945,     // pmol/L // 3 // 14 - 140
-    0.0347,    // mg/mL  // 4
-    0.347,     // mg/dL  // 5
-    3.47,      // mg/L   // 6
-    0,         //µg/mL   // 7
-    0,         //µg/dL   // 8
-    0,         //µg/L    // 9
-    0,         //ng/mL   // 10
-    0.0000347, // g      // 11
-    1,         // IU     // 12
-    1,         // µIU/mL // 13 // 2.0 - 20
-    1          // mIU/L  // 14
+typedef enum Biomarker Biomarker;
+
+namespace Unit {
+    typedef float mmol_L;
+    typedef float µmol_L;
+    typedef float nmol_L;
+    typedef float pmol_L;
+    typedef float mg_mL;
+    typedef float mg_dL;
+    typedef float mg_L;
+    typedef float µg_mL;
+    typedef float µg_dL;
+    typedef float µg_L;
+    typedef float ng_mL;
+    typedef float g;
+    typedef float IU;
+    typedef float µIU_mL;
+    typedef float mIU_L;
+}
+
+enum Units {
+    mmol_L,
+    µmol_L,
+    nmol_L,
+    pmol_L,
+    mg_mL,
+    mg_dL,
+    mg_L,
+    µg_mL,
+    µg_dL,
+    µg_L,
+    ng_mL,
+    g,
+    IU,
+    µIU_mL,
+    mIU_L
 };
 
-double glucose_units[15] = { // index access 1
-    1,          // mmol/l // 0 // 3.2 - 5.5
-    1000,       // µmol/L // 1
-    1000000,    // nmol/L // 2
-    1000000000, // pmol/L // 3
-    0.180156,   // mg/mL  // 4
-    18.0156,    // mg/dL  // 5
-    180.156,    // mg/L   // 6
-    180.156,    // µg/mL  // 7
-    18015.6,    // µg/dL  // 8
-    180156,     // µg/L   // 9
-    180156,     // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
+typedef tuple<
+    Unit::mmol_L,
+    Unit::µmol_L,
+    Unit::nmol_L,
+    Unit::pmol_L,
+    Unit::mg_mL,
+    Unit::mg_dL,
+    Unit::mg_L,
+    Unit::µg_mL,
+    Unit::µg_dL,
+    Unit::µg_L,
+    Unit::ng_mL,
+    Unit::g,
+    Unit::IU,
+    Unit::µIU_mL,
+    Unit::mIU_L
+> OrderedUnits;
+
+
+typedef map<Biomarker, OrderedUnits> BiomarkersToUnitsMap;
+
+OrderedUnits defineUnitsList(
+    float mmol_L,
+    float µmol_L,
+    float nmol_L,
+    float pmol_L,
+    float mg_mL,
+    float mg_dL,
+    float mg_L,
+    float µg_mL,
+    float µg_dL,
+    float µg_L,
+    float ng_mL,
+    float g,
+    float IU,
+    float µIU_mL,
+    float mIU_L
+) {
+    return {
+        mmol_L,
+        µmol_L,
+        nmol_L,
+        pmol_L,
+        mg_mL,
+        mg_dL,
+        mg_L,
+        µg_mL,
+        µg_dL,
+        µg_L,
+        ng_mL,
+        g,
+        IU,
+        µIU_mL,
+        mIU_L
+    };
 };
 
-double ldl_units[15] = { // index access 2
-    0.0259,     // mmol/l // 0 // >4.144
-    0,          // µmol/L // 1
-    0,          // nmol/L // 2
-    0,          // pmol/L // 3
-    0.1,        // mg/mL  // 4 // > 160
-    1,          // mg/dL  // 5
-    10,         // mg/L   // 6
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
+BiomarkersToUnitsMap initBiomarkersToUnitsMap() {
+    return {
+        {
+            INSULIN,
+            defineUnitsList(0, 0, 0, 6.945, 0.0347, 0.347, 3.47, 0, 0, 0, 0, 0.0000347, 1, 1, 1)
+        },
+        {
+            GLUCOSE,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            LDL,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            HDL,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            TG,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            CRP,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            HOMOCYSTEINE,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            THYROTROPIN,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            VITAMIN_D,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            ZINC,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+        {
+            FERRITIN,
+            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+        },
+    };
 };
 
-double hdl_units[15] = { // index access 3
-    0.0259,     // mmol/l // 0 // > 1.03
-    0,          // µmol/L // 1
-    0,          // nmol/L // 2
-    0,          // pmol/L // 3
-    0.1,        // mg/mL  // 4
-    1,          // mg/dL  // 5 // < 40
-    10,         // mg/L   // 6
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
+double convert(enum Biomarker biomarker, Units convertFrom, Units convertTo, double value) {
+    BiomarkersToUnitsMap biomarkersToUnitsMap = initBiomarkersToUnitsMap();
+    
+    OrderedUnits unitsList = biomarkersToUnitsMap.at(biomarker);
+    float unitFrom = unitsList[convertFrom];
+    float unitTo = unitsList[convertTo];
 
-double triglycerides_units[15] = { // index access 4
-    0.0113,     // mmol/l // 0 // 0.14 - 1.82
-    11.2994,    // µmol/L // 1
-    0,          // nmol/L // 2
-    0,          // pmol/L // 3
-    0.1,        // mg/mL  // 4
-    1,          // mg/dL  // 5 // < 160
-    10,         // mg/L   // 6
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
-
-double crp_units[15] = { // index access 5
-    0,          // mmol/l // 0
-    0,          // µmol/L // 1
-    9.524,      // nmol/L // 2
-    0,          // pmol/L // 3
-    0,          // mg/mL  // 4
-    0,          // mg/dL  // 5
-    1,          // mg/L   // 6 // < 5
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
-
-double homocysteine_units[15] = { // index access 6
-    0,          // mmol/l // 0
-    7.397,      // µmol/L // 1 // 5 - 15
-    0,          // nmol/L // 2
-    0,          // pmol/L // 3
-    0,          // mg/mL  // 4
-    0,          // mg/dL  // 5
-    1,          // mg/L   // 6 // 0.68 - 2.02
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
-
-double thyrotropin_units[15] = { // index access 7
-    0,          // mmol/l // 0
-    0,          // µmol/L // 1
-    0,          // nmol/L // 2
-    0,          // pmol/L // 3
-    0,          // mg/mL  // 4
-    0,          // mg/dL  // 5
-    0,          // mg/L   // 6
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    1,          // µIU/mL // 13
-    1           // mIU/L  // 14 // Men: 0.5-6 mIU/L, Women: 4-5 mIU/L
-};
-
-double vitaminD_units[15] = { // index access 8
-    0,          // mmol/l // 0
-    0,          // µmol/L // 1
-    0,          // nmol/L // 2
-    0,          // pmol/L // 3
-    0.0000249,  // mg/mL  // 4
-    0,          // mg/dL  // 5
-    0,          // mg/L   // 6
-    0,          // µg/mL  // 7
-    0,          // µg/dL  // 8
-    0,          // µg/L   // 9
-    0,          // ng/mL  // 10 // 30 - 60
-    0.0000000249,// g     // 11
-    1,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
-
-double zinc_units[15] = { // index access 9
-    1,          // mmol/l // 0 // 10 - 23
-    1000,       // µmol/L // 1
-    1000000,    // nmol/L // 2
-    1000000000, // pmol/L // 3
-    0.06538,    // mg/mL  // 4
-    6.538,      // mg/dL  // 5
-    65.38,      // mg/L   // 6
-    65.38,      // µg/mL  // 7
-    6538,       // µg/dL  // 8
-    65380,      // µg/L   // 9
-    65380,      // ng/mL  // 10
-    0,           // g     // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
-
-double ferritin_units[15] = { // index access 10
-    1,          // mmol/l // 0
-    1000,       // µmol/L // 1
-    1000000,    // nmol/L // 2
-    1000000000, // pmol/L // 3
-    445,        // mg/mL  // 4
-    44504,      // mg/dL  // 5
-    445038,     // mg/L   // 6
-    445038,     // µg/mL  // 7
-    44503783,   // µg/dL  // 8
-    445037828,  // µg/L   // 9 // Women:13 - 150, Men 30 - 400
-    445037828,  // ng/mL  // 10
-    0,          // g      // 11
-    0,          // IU     // 12
-    0,          // µIU/mL // 13
-    0           // mIU/L  // 14
-};
-
-double convert(enum Biomarker biomarker, int16_t convertFrom, int16_t convertTo, double value) {
     switch(biomarker) {
         case 0 :
             printf("Insulin!\n" );
+            
             return value * insulin_units[convertTo] / insulin_units[convertFrom];;
             break;
             
@@ -282,7 +239,8 @@ double convert(enum Biomarker biomarker, int16_t convertFrom, int16_t convertTo,
     }
     return 0;
 };
+
 int main(int argc, const char * argv[]) {
-    std::cout << convert(GLUCOSE,5,0,160);
+    cout << convert(GLUCOSE, mmol_L, mg_dL, 160);
     return 0;
 }
