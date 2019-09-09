@@ -82,7 +82,6 @@ typedef tuple<
     Unit::mIU_L
 > OrderedUnits;
 
-
 typedef map<Biomarker, OrderedUnits> BiomarkersToUnitsMap;
 
 OrderedUnits defineUnitsList(
@@ -172,18 +171,18 @@ BiomarkersToUnitsMap initBiomarkersToUnitsMap() {
 
 double convert(enum Biomarker biomarker, Units convertFrom, Units convertTo, double value) {
     BiomarkersToUnitsMap biomarkersToUnitsMap = initBiomarkersToUnitsMap();
-    
     OrderedUnits unitsList = biomarkersToUnitsMap.at(biomarker);
-    float unitFrom = unitsList[convertFrom];
-    float unitTo = unitsList[convertTo];
+    float unitF = unitsList.get<0>;
+   // float unitFrom = OrderedUnits;
+//float unitTo = unitsList[convertTo];
 
     switch(biomarker) {
         case 0 :
             printf("Insulin!\n" );
             
-            return value * insulin_units[convertTo] / insulin_units[convertFrom];;
+            return value * unitFrom / unitTo;
             break;
-            
+/*
         case 1 :
             printf("Glucose!\n" );
             return value * glucose_units[convertTo] / glucose_units[convertFrom];;
@@ -233,7 +232,7 @@ double convert(enum Biomarker biomarker, Units convertFrom, Units convertTo, dou
             printf("Ferritin!\n" );
             return value * ferritin_units[convertTo] / ferritin_units[convertFrom];;
             break;
-            
+     */
         default:
             printf("Incorrect biomarker!\n" );
     }
