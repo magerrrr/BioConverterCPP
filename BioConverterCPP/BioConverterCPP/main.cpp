@@ -5,11 +5,10 @@
 //  Created by Kirill on 9/4/19.
 //  Copyright © 2019 Kirill. All rights reserved.
 //
-
+//defineUnitsMap(<#float mmol_L#>, <#float µmol_L#>, <#float nmol_L#>, <#float pmol_L#>, <#float mg_mL#>, <#float mg_dL#>, <#float mg_L#>, <#float µg_mL#>, <#float µg_dL#>, <#float µg_L#>, <#float ng_mL#>, <#float g#>, <#float IU#>, <#float µIU_mL#>, <#float mIU_L#>)
+//
 #include <map>
-#include <tuple>
 #include <iostream>
-
 using namespace std;
 
 enum Biomarker {
@@ -26,27 +25,7 @@ enum Biomarker {
     FERRITIN
 };
 
-typedef enum Biomarker Biomarker;
-
-namespace Unit {
-    typedef float mmol_L;
-    typedef float µmol_L;
-    typedef float nmol_L;
-    typedef float pmol_L;
-    typedef float mg_mL;
-    typedef float mg_dL;
-    typedef float mg_L;
-    typedef float µg_mL;
-    typedef float µg_dL;
-    typedef float µg_L;
-    typedef float ng_mL;
-    typedef float g;
-    typedef float IU;
-    typedef float µIU_mL;
-    typedef float mIU_L;
-}
-
-enum Units {
+enum UnitIndex {
     mmol_L,
     µmol_L,
     nmol_L,
@@ -64,27 +43,14 @@ enum Units {
     mIU_L
 };
 
-typedef tuple<
-    Unit::mmol_L,
-    Unit::µmol_L,
-    Unit::nmol_L,
-    Unit::pmol_L,
-    Unit::mg_mL,
-    Unit::mg_dL,
-    Unit::mg_L,
-    Unit::µg_mL,
-    Unit::µg_dL,
-    Unit::µg_L,
-    Unit::ng_mL,
-    Unit::g,
-    Unit::IU,
-    Unit::µIU_mL,
-    Unit::mIU_L
-> OrderedUnits;
+typedef map<UnitIndex, float> UnitsMap;
 
-typedef map<Biomarker, OrderedUnits> BiomarkersToUnitsMap;
+struct Units {
+    string message;
+    UnitsMap unitsMap;
+};
 
-OrderedUnits defineUnitsList(
+UnitsMap defineUnitsMap(
     float mmol_L,
     float µmol_L,
     float nmol_L,
@@ -102,144 +68,122 @@ OrderedUnits defineUnitsList(
     float mIU_L
 ) {
     return {
-        mmol_L,
-        µmol_L,
-        nmol_L,
-        pmol_L,
-        mg_mL,
-        mg_dL,
-        mg_L,
-        µg_mL,
-        µg_dL,
-        µg_L,
-        ng_mL,
-        g,
-        IU,
-        µIU_mL,
-        mIU_L
+        { UnitIndex::mmol_L, mmol_L },
+        { UnitIndex::µmol_L, µmol_L, },
+        { UnitIndex::nmol_L, nmol_L, },
+        { UnitIndex::pmol_L, pmol_L, },
+        { UnitIndex::mg_mL, mg_mL, },
+        { UnitIndex::mg_dL, mg_dL, },
+        { UnitIndex::mg_L, mg_L, },
+        { UnitIndex::µg_mL, µg_mL, },
+        { UnitIndex::µg_dL, µg_dL, },
+        { UnitIndex::µg_L, µg_L, },
+        { UnitIndex::ng_mL, ng_mL, },
+        { UnitIndex::g, g, },
+        { UnitIndex::IU, IU, },
+        { UnitIndex::µIU_mL, µIU_mL, },
+        { UnitIndex::mIU_L, mIU_L, },
     };
 };
 
-BiomarkersToUnitsMap initBiomarkersToUnitsMap() {
+map<Biomarker, Units> initBiomarkersToUnitsMap() {
     return {
         {
             INSULIN,
-            defineUnitsList(0, 0, 0, 6.945, 0.0347, 0.347, 3.47, 0, 0, 0, 0, 0.0000347, 1, 1, 1)
+            ((struct Units) {
+                "Insulin",
+                defineUnitsMap(6.94e-9, 6.94e-6, 6.945e-3, 6.945, 0.0347, 0.347, 3.47, 3.47, 347, 3470, 3470, 0.0000347, 1, 1, 1)
+            })
         },
         {
             GLUCOSE,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Glucose",
+                defineUnitsMap(1, 1000, 1000000, 1000000000, 0.180156, 18.0156, 180.156, 180.156, 18015.6, 180156, 180156, 0, 0, 0, 0)
+            })
         },
         {
             LDL,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Cholesterol, low-density (LDL) (high level)",
+                defineUnitsMap(0.0259, 0, 0, 0, 0.1, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0)
+            })
         },
         {
             HDL,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Cholesterol, high-density (HDL) (low level)",
+                defineUnitsMap(0.0259, 0, 0, 0, 0.1, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0)
+            })
         },
         {
             TG,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Triglycerides",
+                defineUnitsMap(0.0113, 11.2994, 0, 0, 0.1, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0)
+            })
         },
         {
             CRP,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "C-reactive protein",
+                defineUnitsMap(0, 0, 9.524, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+            })
         },
         {
             HOMOCYSTEINE,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Homocysteine",
+                defineUnitsMap(0, 7.397, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+            })
         },
         {
             THYROTROPIN,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Thyrotropin (TSH)",
+                defineUnitsMap(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1)
+            })
         },
         {
             VITAMIN_D,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Vitamin D",
+                defineUnitsMap(0, 0, 0.0000000000249, 0.0000000249, 0.0000249, 0.00249, 0.0249, 0.0249, 2.49, 24.9, 24.9, 0.0000000347, 1, 0, 0)
+            })
         },
         {
             ZINC,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Zinc",
+                defineUnitsMap(1, 1000, 1000000, 1000000000, 0.06538, 6.538, 65.38, 65.38, 6538, 65380, 65380, 0, 0, 0, 0)
+            })
         },
         {
             FERRITIN,
-            defineUnitsList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            ((struct Units) {
+                "Ferritin",
+                defineUnitsMap(1, 1000, 1000000, 1000000000, 445, 44504, 445038, 445038, 44503783, 445037828, 445037828, 0, 0, 0, 0)
+            })
         },
     };
 };
 
-double convert(enum Biomarker biomarker, Units convertFrom, Units convertTo, double value) {
-    BiomarkersToUnitsMap biomarkersToUnitsMap = initBiomarkersToUnitsMap();
-    OrderedUnits unitsList = biomarkersToUnitsMap.at(biomarker);
-    float unitF = unitsList.get<0>;
-   // float unitFrom = OrderedUnits;
-//float unitTo = unitsList[convertTo];
-
-    switch(biomarker) {
-        case 0 :
-            printf("Insulin!\n" );
-            
-            return value * unitFrom / unitTo;
-            break;
-/*
-        case 1 :
-            printf("Glucose!\n" );
-            return value * glucose_units[convertTo] / glucose_units[convertFrom];;
-            break;
-            
-        case 2 :
-            printf("Cholesterol, low-density (LDL) (high level)!\n" );
-            return value * ldl_units[convertTo] / ldl_units[convertFrom];;
-            break;
-            
-        case 3 :
-            printf("Cholesterol, high-density (HDL) (low level)!\n" );
-            return value * hdl_units[convertTo] / hdl_units[convertFrom];;
-            break;
-            
-        case 4 :
-            printf("Triglycerides!\n" );
-            return value * triglycerides_units[convertTo] / triglycerides_units[convertFrom];;
-            break;
-            
-        case 5 :
-            printf("C-reactive protein!\n" );
-            return value * crp_units[convertTo] / crp_units[convertFrom];;
-            break;
-            
-        case 6 :
-            printf("Homocysteine!\n" );
-            return value * homocysteine_units[convertTo] / homocysteine_units[convertFrom];;
-            break;
-            
-        case 7 :
-            printf("Thyrotropin (TSH)!\n" );
-            return value * thyrotropin_units[convertTo] / thyrotropin_units[convertFrom];;
-            break;
-            
-        case 8 :
-            printf("Vitamin D!\n" );
-            return value * vitaminD_units[convertTo] / vitaminD_units[convertFrom];;
-            break;
-            
-        case 9 :
-            printf("Zinc!\n" );
-            return value * zinc_units[convertTo] / zinc_units[convertFrom];;
-            break;
-            
-        case 10 :
-            printf("Ferritin!\n" );
-            return value * ferritin_units[convertTo] / ferritin_units[convertFrom];;
-            break;
-     */
-        default:
-            printf("Incorrect biomarker!\n" );
-    }
-    return 0;
+float convert(Biomarker biomarker, UnitIndex convertFrom, UnitIndex convertTo, double value) {
+    const auto biomarkersToUnitsMap = initBiomarkersToUnitsMap();
+    const Units units = biomarkersToUnitsMap.at(biomarker);
+    const auto unitFrom = units.unitsMap.at(convertFrom);
+    const auto unitTo = units.unitsMap.at(convertTo);
+    
+    cout    << "convertFrom: " << (unsigned int)convertFrom << "\n"
+            << "convertTo: " << (unsigned int)convertTo << "\n"
+            << "unitFrom: " << unitFrom << "\n"
+            << "unitTo: " << unitTo << "\n"
+            << units.message << "!\n";
+    
+    return value * unitTo / unitFrom;
 };
 
 int main(int argc, const char * argv[]) {
-    cout << convert(GLUCOSE, mmol_L, mg_dL, 160);
+    cout << convert(GLUCOSE, mmol_L, mg_dL, 5.5) << "\n";
     return 0;
 }
